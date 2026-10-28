@@ -1,1 +1,2 @@
-- 2026-10-28 — Asked: commit all changes as "Add lion species with random walk", push to GitHub, and log it here. Did: there was nothing new to commit, so renamed the commit that added the lion model to that message (now e587e6b), pushed main to GitHub (d0101e2..df1de48), and created this log.
+- **Lions:** Asked for 20 lions with the moving skill that wander every step, drawn as orange circles of size 3, shown in one GUI display. Implemented a commented lion species with a wander reflex and an orange `circle(3)` aspect, created 20 of them in the global init, and added a GUI experiment with one display of the lions.
+  Tested in GAMA: ran correctly on the first try; nothing rejected or corrected.
