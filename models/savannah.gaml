@@ -2,8 +2,9 @@
 * Name: savannah
 * African savannah model: 20 lions and 20 zebras walk around randomly,
 * and lions kill any zebra within 3 m. They move over a 50 x 50 grassland
-* grid whose grass grows 0.1 kg per step, and each zebra eats 1 kg of grass
-* per step from the cell it stands on.
+* grid whose grass grows 0.1 kg per step up to 10 kg, and each zebra eats 1 kg of grass
+* per step from the cell it stands on. Lions start with 10 energy, lose 0.1
+* per step, gain 5 per zebra killed, and die when their energy runs out.
 * Specification: spec.md
 * Author: Nihal Aliyeva
 * Tags: ABM, CA
@@ -20,18 +21,28 @@ global {
     }
 }
 
-/* Lion: an agent that walks around randomly and kills zebras within 3 m */
+/* Lion: an agent that walks around randomly, kills zebras within 3 m to gain energy, and dies when its energy runs out */
 species lion skills: [moving] {
-    /* Moves the lion in a random direction each step */
+    /* Energy of the lion: starts at 10, -0.1 per step moved, +5 per zebra killed, no maximum */
+    float energy <- 10.0;
+
+    /* Moves the lion in a random direction each step, which costs 0.1 energy (rounded to one decimal so energy reaches exactly 0) */
     reflex walk {
         do wander;
+        energy <- (energy - 0.1) with_precision 1;
     }
 
-    /* Kills every zebra within 3 m of the lion each step */
+    /* Kills every zebra within 3 m of the lion each step, gaining 5 energy per zebra killed */
     reflex hunt {
         ask zebra at_distance 3 {
+            myself.energy <- myself.energy + 5.0;
             do die;
         }
+    }
+
+    /* Dies when energy is 0 or below, checked at the end of the step after moving and hunting */
+    reflex starve when: energy <= 0 {
+        do die;
     }
 
     /* Draws the lion as an orange circle of radius 3 */
@@ -62,8 +73,8 @@ species zebra skills: [moving] {
 
 /* Grass: the 50 x 50 grassland cells of the CA, each holding grass biomass */
 grid grass width: 50 height: 50 {
-    /* Grass biomass in the cell (kg): random 0-10 at the start, plus 0.1 kg every step */
-    float biomass <- rnd(10.0) update: biomass + 0.1;
+    /* Grass biomass in the cell (kg): random 0-10 at the start, plus 0.1 kg every step, capped at 10 kg */
+    float biomass <- rnd(10.0) max: 10.0 update: biomass + 0.1;
     /* Cell colour, recalculated every step after biomass: pale green at 0 kg, dark green at 10 kg or more */
     rgb color <- blend(rgb(0, 100, 0), rgb(200, 255, 200), min(biomass / 10.0, 1.0))
         update: blend(rgb(0, 100, 0), rgb(200, 255, 200), min(biomass / 10.0, 1.0));
