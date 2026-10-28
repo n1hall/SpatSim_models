@@ -1,6 +1,7 @@
 /**
 * Name: savannah
-* African savannah model: 20 lions and 20 zebras walk around randomly.
+* African savannah model: 20 lions and 20 zebras walk around randomly,
+* and lions kill any zebra within 3 m.
 * Specification: spec.md
 * Author: Nihal Aliyeva
 * Tags: ABM
@@ -17,11 +18,18 @@ global {
     }
 }
 
-/* Lion: an agent that walks around randomly */
+/* Lion: an agent that walks around randomly and kills zebras within 3 m */
 species lion skills: [moving] {
     /* Moves the lion in a random direction each step */
     reflex walk {
         do wander;
+    }
+
+    /* Kills every zebra within 3 m of the lion each step */
+    reflex hunt {
+        ask zebra at_distance 3 {
+            do die;
+        }
     }
 
     /* Draws the lion as an orange circle of radius 3 */
