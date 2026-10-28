@@ -1,2 +1,8 @@
 - **Lions:** Asked for 20 lions with the moving skill that wander every step, drawn as orange circles of size 3, shown in one GUI display. Implemented a commented lion species with a wander reflex and an orange `circle(3)` aspect, created 20 of them in the global init, and added a GUI experiment with one display of the lions.
   Tested in GAMA: ran correctly on the first try; nothing rejected or corrected.
+- **Zebras:** Asked for 20 zebras with the moving skill that wander every step, drawn as grey triangles of size 2, added to the display, and nothing else. Implemented a commented zebra species with a wander reflex and a grey `triangle(2)` aspect, created 20 of them in the global init, and drew them in the display under the lions.
+  Tested in GAMA: ran correctly on the first try; nothing rejected or corrected.
+- **Hunting:** Asked for a lion reflex that, every step, makes every zebra within distance 3 (`at_distance`) execute `die`. Implemented a commented `hunt` reflex on the lion, after its walk, that asks every zebra at distance 3 to die.
+  Tested in GAMA: ran correctly on the first try; nothing rejected or corrected.
+- **Grass grid:** Asked for the 50 x 50 grassland grid from the spec, between the species and the experiment, with biomass starting at `rnd(10.0)`, growing 0.1 per step, and coloured a shade of green that follows biomass and is recalculated every step, drawn under the animals. Implemented a commented `grass` grid whose biomass and colour both use `update:` (pale green at 0 kg to dark green at 10 kg or more), drawn as the first layer of the display.
+  Tested in GAMA: ran correctly on the first try; nothing rejected or corrected.
