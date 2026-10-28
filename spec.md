@@ -73,9 +73,23 @@ Every species, attribute and reflex gets a comment (see `AGENTS.md`).
 
 ## 7. Not specified by the task (out of scope unless requested)
 
-- Zebras eating grass. The agents do not change the grass in this version.
+- Zebras eating grass: added as Extension 1, see section 8.
 - Energy, reproduction, or lions dying.
 - Movement speed. The `moving` skill's default is used. Its value is not stated on the GAMA wiki page checked.
 - A stop condition. The simulation runs until it is stopped by hand.
 - Charts, monitors or output files.
 - The order in which lions, zebras and cells act within a step.
+
+## 8. Extension 1: zebras eat grass
+
+Added after v0.1. Everything else in this spec stays the same.
+
+| Item | Specification |
+|---|---|
+| Who eats | Every living zebra |
+| When | Every step, after the zebra has moved |
+| Which cell | The grass cell the zebra stands on (the cell under its location) |
+| Amount | Reduces that cell's `biomass` by 1 kg |
+| Lower limit | Biomass never goes below 0 kg; a cell with less than 1 kg drops to 0 |
+| Several zebras on one cell | Each zebra removes 1 kg in turn, still never below 0 |
+| Grass growth and colour | Unchanged: the cell still gains 0.1 kg per step and its colour still follows biomass |

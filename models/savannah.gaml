@@ -2,7 +2,8 @@
 * Name: savannah
 * African savannah model: 20 lions and 20 zebras walk around randomly,
 * and lions kill any zebra within 3 m. They move over a 50 x 50 grassland
-* grid whose grass grows 0.1 kg per step.
+* grid whose grass grows 0.1 kg per step, and each zebra eats 1 kg of grass
+* per step from the cell it stands on.
 * Specification: spec.md
 * Author: Nihal Aliyeva
 * Tags: ABM, CA
@@ -39,11 +40,18 @@ species lion skills: [moving] {
     }
 }
 
-/* Zebra: an agent that walks around randomly */
+/* Zebra: an agent that walks around randomly and eats grass */
 species zebra skills: [moving] {
     /* Moves the zebra in a random direction each step */
     reflex walk {
         do wander;
+    }
+
+    /* Eats 1 kg of grass from the cell it stands on each step, never taking biomass below 0 */
+    reflex eat {
+        ask grass(location) {
+            biomass <- max(0.0, biomass - 1.0);
+        }
     }
 
     /* Draws the zebra as a grey triangle with sides of 2 */
