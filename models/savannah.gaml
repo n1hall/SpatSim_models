@@ -1,10 +1,11 @@
 /**
 * Name: savannah
 * African savannah model: 20 lions and 20 zebras walk around randomly,
-* and lions kill any zebra within 3 m.
+* and lions kill any zebra within 3 m. They move over a 50 x 50 grassland
+* grid whose grass grows 0.1 kg per step.
 * Specification: spec.md
 * Author: Nihal Aliyeva
-* Tags: ABM
+* Tags: ABM, CA
 */
 
 model savannah
@@ -51,11 +52,21 @@ species zebra skills: [moving] {
     }
 }
 
-/* Main experiment: shows the lions and zebras moving around */
+/* Grass: the 50 x 50 grassland cells of the CA, each holding grass biomass */
+grid grass width: 50 height: 50 {
+    /* Grass biomass in the cell (kg): random 0-10 at the start, plus 0.1 kg every step */
+    float biomass <- rnd(10.0) update: biomass + 0.1;
+    /* Cell colour, recalculated every step after biomass: pale green at 0 kg, dark green at 10 kg or more */
+    rgb color <- blend(rgb(0, 100, 0), rgb(200, 255, 200), min(biomass / 10.0, 1.0))
+        update: blend(rgb(0, 100, 0), rgb(200, 255, 200), min(biomass / 10.0, 1.0));
+}
+
+/* Main experiment: shows the grassland with the lions and zebras moving on it */
 experiment savannah type: gui {
     output {
-        /* Map of the savannah: zebras first, then lions drawn on top */
+        /* Map of the savannah: grass first, then zebras, then lions on top */
         display map {
+            grid grass;
             species zebra aspect: base;
             species lion aspect: base;
         }
