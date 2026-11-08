@@ -55,19 +55,18 @@ The GAMA docs page for the `moving` skill only says that `heading` is "the absol
 
 ### 2.4 Aspect
 
-Every agent is drawn as a circle of radius 1 in its species' colour.
+Every agent is drawn as a filled circle of radius 0.3 in its species' colour, on top of its action neighbourhood (section 3). The small radius keeps the neighbourhood circles visible: a goat's 0.5 m circle would be hidden under a body of radius 1.
 
 ## 3. Action neighbourhood
 
-Each agent's action neighbourhood is the area it can get to in one step. It is drawn see-through in the agent's colour, underneath the agents, for the agent's next step:
+Each agent's action neighbourhood shows how far it can get in one step. Each species' aspect draws it around the agent first, then draws the agent on top:
 
 | Species | Drawn as |
 |---|---|
-| Cow | A slice of a circle with radius 2, centred on the cow, covering every heading from 90° left to 90° right of its current heading (a half-disc in front of the cow). Because `wander` always moves exactly 2 m, the cow will end up somewhere on the curved edge of this slice. |
-| Sheep | A line 1 m long from the sheep straight south, to the one point it can reach |
-| Goat | A line from the goat towards {0, 0}, 0.5 m long or shorter if the goat is closer than 0.5 m to the origin. Nothing is drawn once the goat is at {0, 0}. |
+| All | An unfilled (wireframe) circle in the agent's colour, centred on the agent, with radius equal to its speed: 2 m for cows, 1 m for sheep, 0.5 m for goats |
+| Cow (in addition) | A see-through brown slice of the same circle (radius 2), covering every heading from 90° left to 90° right of the cow's current heading: the directions its next `wander` step can take. The cow ends up on the curved edge of this slice. |
 
-The neighbourhood shows the one-step reach without taking the world edge into account. Near the edge, part of it may lie where the agent cannot actually go (see section 4).
+The circle shows the distance covered in one step, not the exact reach: a sheep can only reach the point 1 m south of it, and a goat only the point 0.5 m towards {0, 0} (or {0, 0} itself once it is closer than that). The drawing also ignores the world edge, so near the edge part of it may lie where the agent cannot go (see section 4).
 
 ## 4. World edge
 
@@ -84,7 +83,7 @@ A move that would take an agent outside the world does not happen. Tested behavi
 ## 5. Experiment
 
 - One GUI experiment with one display.
-- The display draws the action neighbourhoods first, then the cows, sheep and goats on top.
+- The display has one layer per species: cows, then sheep, then goats. In each layer, the species' aspect draws every agent's action neighbourhood first and the agent on top of it.
 
 ## 6. File layout
 
@@ -103,11 +102,11 @@ Every species, attribute and reflex gets a comment (see `AGENTS.md`).
 | Question | Decision |
 |---|---|
 | What "max 90° turning angle" means | Up to 90° left or right per step (`amplitude: 180.0`) |
-| How to draw the action neighbourhood | The exact one-step reach: a half-disc slice for cows, short lines for sheep and goats (section 3) |
+| How to draw the action neighbourhood | An unfilled circle of radius = speed for every agent, plus a see-through ±90° slice for cows (section 3) |
 | World edge | Agents stay inside the world; no wrap-around (section 4) |
 | World size and time step | GAMA defaults: 100 x 100 m, 1 s per step |
 | Start positions | Random; cows also start with a random heading |
-| Agent shape | Circles of radius 1 |
+| Agent shape | Filled circles of radius 0.3, so the neighbourhood circles stay visible |
 
 ## 8. Not specified by the assignment (out of scope unless requested)
 

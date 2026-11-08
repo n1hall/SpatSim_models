@@ -27,9 +27,15 @@ species cow skills: [moving] {
         do wander speed: 2.0 amplitude: 180.0;
     }
 
-    /* Draws the cow as a brown circle of radius 1 */
+    /* Draws the action neighbourhood (a see-through brown slice covering 90 degrees either side of the heading, and an unfilled brown circle, both of radius 2 = speed), then the cow on top as a brown circle of radius 0.3 */
     aspect base {
-        draw circle(1) color: #brown;
+        list<point> sector <- [location];
+        loop a from: -90 to: 90 step: 5 {
+            sector <- sector + [location + {2.0 * cos(heading + a), 2.0 * sin(heading + a)}];
+        }
+        draw polygon(sector) color: rgb(#brown, 0.3);
+        draw circle(2.0) color: #brown wireframe: true;
+        draw circle(0.3) color: #brown;
     }
 }
 
@@ -40,9 +46,10 @@ species sheep skills: [moving] {
         do move heading: 90.0 speed: 1.0;
     }
 
-    /* Draws the sheep as a black circle of radius 1 */
+    /* Draws the action neighbourhood as an unfilled black circle of radius 1 (= speed), then the sheep on top as a black circle of radius 0.3 */
     aspect base {
-        draw circle(1) color: #black;
+        draw circle(1.0) color: #black wireframe: true;
+        draw circle(0.3) color: #black;
     }
 }
 
@@ -53,9 +60,10 @@ species goat skills: [moving] {
         do goto target: {0.0, 0.0} speed: 0.5;
     }
 
-    /* Draws the goat as a yellow circle of radius 1 */
+    /* Draws the action neighbourhood as an unfilled yellow circle of radius 0.5 (= speed), then the goat on top as a yellow circle of radius 0.3 */
     aspect base {
-        draw circle(1) color: #yellow;
+        draw circle(0.5) color: #yellow wireframe: true;
+        draw circle(0.3) color: #yellow;
     }
 }
 
