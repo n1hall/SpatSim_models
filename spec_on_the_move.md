@@ -27,7 +27,7 @@ The GAMA docs page for the `moving` skill only says that `heading` is "the absol
 | Start | Random location and random heading |
 | Movement | Correlated random walk: every step, `do wander speed: 2.0 amplitude: 180.0;` |
 | Speed | 2 m per step |
-| Turning angle | At most 90° to the left or to the right of the current heading per step |
+| Turning angle | At most 90° to the left or to the right of the current heading per step (except at the world edge, see section 4) |
 
 **How `amplitude` maps to "max 90° turning angle":** the GAMA docs for the `moving` skill say that for `wander` "the new heading is chosen in the range (heading - amplitude/2, heading+amplitude/2)". A cow that may turn up to 90° either way therefore needs `amplitude: 180.0` (180 / 2 = 90). This was confirmed by test: over 2,000 steps, `amplitude: 180.0` gave a largest turn of 89.95°, while `amplitude: 90.0` gave only 44.98° (a 90° window, ±45°). Every `wander` step was exactly 2 m long.
 
@@ -77,7 +77,7 @@ A move that would take an agent outside the world does not happen. Tested behavi
 | Species | What happens at the edge |
 |---|---|
 | Sheep | They stop where their next 1 m step would end outside the world, and stay there. A sheep starting at y = 97.5 moved to 98.5, then 99.5, and then stayed at 99.5. Sheep end up lined up along the south edge, up to 1 m short of it. |
-| Cows | `wander` keeps them inside. Over 2,000 steps, a cow starting at the east edge stayed within x 0.02–99.97 and y 0.04–98.2; 65 of its steps were shorter than 2 m because of the edge. |
+| Cows | `wander` keeps them inside. Over 2,000 steps, a cow starting at the east edge stayed within x 0.02–99.97 and y 0.04–98.2; 65 of its steps were shorter than 2 m because of the edge. On those edge steps `wander` can also turn a cow by more than 90°: in a 500-step test with 5 cows, all 88 turns larger than 90° (up to 180°) happened within 2 m of an edge, each on a shortened step, while every turn away from the edges was at most 89.95°. This is accepted. |
 | Goats | Their target {0, 0} is the top-left corner, which is inside the world, so they never cross an edge. They stop at the corner. |
 
 ## 5. Experiment
