@@ -40,6 +40,7 @@ The GAMA docs page for the `moving` skill only says that `heading` is "the absol
 | Start | Random location |
 | Movement | All sheep move due south every step: `do move heading: 90.0 speed: 1.0;` |
 | Speed | 1 m per step |
+| Tested | In a 120-step headless test of the model, each sheep's x stayed the same and its y grew by exactly 1 per step until the next step would have left the world; it then stayed put (at y = 99.69, 99.82 and 99.92). In the display snapshots the sheep moved down, which is south: their average pixel row went from 225 (step 0) to 335 (step 30), 431 (step 60) and 497 (step 90, the bottom of the 500-pixel-high image). |
 
 ### 2.3 Goats
 
