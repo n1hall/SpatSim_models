@@ -12,10 +12,11 @@ model on_the_move
 
 /* Global: sets up the world and the starting population */
 global {
-    /* Creates the agents at the start: 5 cows (each with GAMA's random starting heading) and 3 sheep, all at random locations */
+    /* Creates the agents at the start: 5 cows (each with GAMA's random starting heading), 3 sheep and 2 goats, all at random locations */
     init {
         create cow number: 5;
         create sheep number: 3;
+        create goat number: 2;
     }
 }
 
@@ -45,17 +46,27 @@ species sheep skills: [moving] {
     }
 }
 
-/* Goat: will walk towards the origin {0, 0} (no behaviour yet) */
+/* Goat: walks straight towards the origin {0, 0}, 0.5 m per step, and stops there */
 species goat skills: [moving] {
+    /* Moves 0.5 m each step towards {0, 0}; once there, goto leaves the goat where it is */
+    reflex move {
+        do goto target: {0.0, 0.0} speed: 0.5;
+    }
+
+    /* Draws the goat as a yellow circle of radius 1 */
+    aspect base {
+        draw circle(1) color: #yellow;
+    }
 }
 
 /* Main experiment: will show the animals and their action neighbourhoods */
 experiment on_the_move type: gui {
     output {
-        /* Map of the world: the cows and sheep so far */
+        /* Map of the world: the cows, sheep and goats */
         display map {
             species cow aspect: base;
             species sheep aspect: base;
+            species goat aspect: base;
         }
     }
 }
