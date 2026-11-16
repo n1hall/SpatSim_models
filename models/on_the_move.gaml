@@ -34,6 +34,14 @@ global {
         sheep_at_edge <- sheep count (each.location.y >= world.shape.height - 1.0);
         goats_at_origin <- goat count ((each.location distance_to {0, 0}) < 0.5);
     }
+
+    /* Every cycle, writes the counters and each species' mean distance travelled to ../results/on_the_move.csv; the file starts fresh with a header row at cycle 0 */
+    reflex save_cycle {
+        if cycle = 0 {
+            save ["cycle", "sheep_at_edge", "goats_at_origin", "mean_cow_distance", "mean_sheep_distance", "mean_goat_distance"] to: "../results/on_the_move.csv" format: "csv" rewrite: true header: false;
+        }
+        save [cycle, sheep_at_edge, goats_at_origin, mean(cow collect each.distance_travelled), mean(sheep collect each.distance_travelled), mean(goat collect each.distance_travelled)] to: "../results/on_the_move.csv" format: "csv" rewrite: false header: false;
+    }
 }
 
 /* Cow: correlated random walk, 2 m per step, heading change within a 90-degree range (-45 to +45) */
@@ -137,6 +145,33 @@ species goat skills: [moving] {
 
 /* Main experiment: bodies and action neighbourhoods as separate layers, plus verification monitors and charts */
 experiment on_the_move type: gui {
+    /* Becomes true once the end-of-run files are saved, so save_and_pause fires only once */
+    bool finished <- false;
+
+    /* Fires once, when all 3 sheep are at the south edge and both goats at the origin: appends a summary row, writes fresh agents_end.csv and cow_turns.csv, then pauses */
+    reflex save_and_pause when: !finished and simulation.sheep_at_edge = 3 and simulation.goats_at_origin = 2 {
+        finished <- true;
+        ask simulation {
+            if !file_exists("../results/summary.csv") {
+                save ["cycle", "mean_cow_distance", "mean_sheep_distance", "mean_goat_distance"] to: "../results/summary.csv" format: "csv" rewrite: false header: false;
+            }
+            save [cycle, mean(cow collect each.distance_travelled), mean(sheep collect each.distance_travelled), mean(goat collect each.distance_travelled)] to: "../results/summary.csv" format: "csv" rewrite: false header: false;
+
+            save ["name", "species", "x", "y", "distance_travelled"] to: "../results/agents_end.csv" format: "csv" rewrite: true header: false;
+            ask cow { save [name, "cow", location.x, location.y, distance_travelled] to: "../results/agents_end.csv" format: "csv" rewrite: false header: false; }
+            ask sheep { save [name, "sheep", location.x, location.y, distance_travelled] to: "../results/agents_end.csv" format: "csv" rewrite: false header: false; }
+            ask goat { save [name, "goat", location.x, location.y, distance_travelled] to: "../results/agents_end.csv" format: "csv" rewrite: false header: false; }
+
+            save ["turn"] to: "../results/cow_turns.csv" format: "csv" rewrite: true header: false;
+            loop t over: turns {
+                save [t] to: "../results/cow_turns.csv" format: "csv" rewrite: false header: false;
+            }
+
+            /* A plain "do pause;" in an experiment reflex does not compile in GAMA 2025.6.4; asking the simulation to pause does */
+            do pause;
+        }
+    }
+
     output {
         /* Shows all displays side by side */
         layout #split;

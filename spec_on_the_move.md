@@ -156,15 +156,20 @@ The monitors appear in GAMA's monitor view. Each chart gets its own display: "Go
 
 All files go to the `results/` folder in the project root, which git already ignores. From the model file they are `../results/...`.
 
-| File | When | Contents |
-|---|---|---|
-| `results/on_the_move.csv` | One row every cycle | cycle, `sheep_at_edge`, `goats_at_origin`, and the mean `distance_travelled` of the cows, the sheep and the goats |
-| `results/agents_end.csv` | Once, when the run pauses | One row per agent: species, name, `distance_travelled` |
-| `results/cow_turns.csv` | Once, when the run pauses | The `turns` list, one heading change per row |
+| File | When | Contents | Between runs |
+|---|---|---|---|
+| `results/on_the_move.csv` | One row every cycle, written by the global reflex `save_cycle` | Header row, then cycle, `sheep_at_edge`, `goats_at_origin`, and the mean `distance_travelled` of the cows, the sheep and the goats | Fresh each run: the header row is written with `rewrite: true` at cycle 0 |
+| `results/summary.csv` | Once, when the run pauses | One row: cycle, and the mean `distance_travelled` of the cows, the sheep and the goats | Appended (`rewrite: false`), so it collects one row per run; the header row is written only when the file does not exist yet |
+| `results/agents_end.csv` | Once, when the run pauses | Header row, then one row per agent: name, species, x, y, `distance_travelled` | Fresh each run: the header row is written with `rewrite: true` |
+| `results/cow_turns.csv` | Once, when the run pauses | Header row "turn", then the `turns` list, one heading change per row | Fresh each run, like `agents_end.csv` |
+
+All files are written with `format: "csv"` and `header: false`; the header rows are written explicitly.
 
 ### 9.4 Pause
 
-A global reflex pauses the simulation (`do pause;`) when `sheep_at_edge = 3` and `goats_at_origin = 2`, right after writing `agents_end.csv` and `cow_turns.csv`. Sheep reach the south edge within about 100 cycles. A goat needs at most about 283 cycles to reach {0, 0} from the farthest corner (141 m at 0.5 m per step), so every run pauses within about 285 cycles.
+An experiment-level reflex, `save_and_pause`, fires once when `sheep_at_edge = 3` and `goats_at_origin = 2`. An experiment attribute `finished` stops it from firing again. Inside `ask simulation { ... }` it writes `summary.csv`, `agents_end.csv` and `cow_turns.csv`, then pauses with `do pause;`. The pause is inside the `ask simulation` block because a plain `do pause;` in an experiment reflex does not compile in GAMA 2025.6.4.
+
+Sheep reach the south edge within about 100 cycles. A goat needs at most about 283 cycles to reach {0, 0} from the farthest corner (141 m at 0.5 m per step), so every run pauses within about 285 cycles. In a headless test (seed 1) the reflex fired once, at cycle 92: `on_the_move.csv` first shows 3 sheep and 2 goats in its row for cycle 91, and the summary row says cycle 92 because the experiment reflex runs after that cycle's simulation step. The headless runner does not pause, so that run continued to its last step; in the GAMA app the run stops there.
 
 ## Source
 
