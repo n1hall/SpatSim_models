@@ -135,9 +135,17 @@ species goat skills: [moving] {
     }
 }
 
-/* Main experiment: bodies and action neighbourhoods as separate layers */
+/* Main experiment: bodies and action neighbourhoods as separate layers, plus verification monitors and charts */
 experiment on_the_move type: gui {
     output {
+        /* Shows all displays side by side */
+        layout #split;
+
+        /* Number of sheep within 1 m of the south edge */
+        monitor "Sheep at south edge" value: sheep_at_edge;
+        /* Number of goats within 0.5 m of the origin */
+        monitor "Goats at origin" value: goats_at_origin;
+
         /* Bodies first, then the see-through neighbourhoods on top */
         display "Action Neighbourhoods" {
             species cow aspect: default;
@@ -146,6 +154,27 @@ experiment on_the_move type: gui {
             species sheep aspect: action_neighbourhood transparency: 0.5;
             species goat aspect: default;
             species goat aspect: action_neighbourhood transparency: 0.5;
+        }
+
+        /* Mean distance travelled by the goats over time: should rise by 0.5 per step until they reach the origin */
+        display "Goats mean distance" {
+            chart "Goats: mean distance travelled" type: series {
+                data "goats" value: mean(goat collect each.distance_travelled);
+            }
+        }
+
+        /* One point per step: mean sheep distance (x) against mean cow distance (y); y = 2x while no animal is at an edge */
+        display "Sheep vs cows" {
+            chart "Sheep vs cows" type: scatter {
+                data "sheep vs cows" value: [mean(sheep collect each.distance_travelled), mean(cow collect each.distance_travelled)];
+            }
+        }
+
+        /* Cow heading changes in 5-degree bins from -180 to 180: should fill only -45 to 45, apart from edge steps; all bars stay at 0 while turns is still empty */
+        display "Cow turns" {
+            chart "Cow turns" type: histogram {
+                datalist (distribution_of([0.0], 72, -180, 180) at "legend") value: (empty(turns) ? list_with(72, 0) : (distribution_of(turns, 72, -180, 180) at "values"));
+            }
         }
     }
 }

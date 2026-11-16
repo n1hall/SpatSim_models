@@ -144,13 +144,13 @@ The two counters are recomputed by a global reflex every cycle. Global reflexes 
 
 | Output | Shows | What it should look like if the rules work |
 |---|---|---|
-| Monitor "Sheep at edge" | `sheep_at_edge` | Rises to 3 within about 100 cycles and stays there |
+| Monitor "Sheep at south edge" | `sheep_at_edge` | Rises to 3 within about 100 cycles and stays there |
 | Monitor "Goats at origin" | `goats_at_origin` | Rises to 2 and stays there |
 | Series chart "Goats: mean distance travelled" | One line: the mean of `distance_travelled` over all goats, per cycle | Rises by 0.5 per cycle while both goats walk, more slowly once one has arrived, and stays flat once both are at {0, 0} |
 | Scatter chart "Sheep vs cows" | One point per cycle: x = mean `distance_travelled` of the sheep, y = mean `distance_travelled` of the cows | Points on the line y = 2x while no animal is held back by an edge; the points bend upwards once sheep stop at the south edge |
 | Histogram "Cow turns" | `turns` in 5° bins from −180° to 180° (72 bins), e.g. with `distribution_of(turns, 72, -180.0, 180.0)` | About equally full bins between −45° and 45°, and only a few values outside that range, from steps at the world edge (section 4) |
 
-The monitors appear in GAMA's monitor view. Each chart gets its own display, next to the "Action Neighbourhoods" map.
+The monitors appear in GAMA's monitor view. Each chart gets its own display: "Goats mean distance" (no colon, which Windows can't use in snapshot file names), "Sheep vs cows" and "Cow turns". `layout #split;` shows the "Action Neighbourhoods" map and the three chart displays side by side. The histogram uses `datalist` with the "legend" and "values" of `distribution_of(turns, 72, -180, 180)`. Because `distribution_of` returns an empty map for an empty list, the legend is taken from `distribution_of([0.0], 72, -180, 180)` (the bin labels never change), and the values are 72 zeros while `turns` is still empty.
 
 ### 9.3 CSV output
 
